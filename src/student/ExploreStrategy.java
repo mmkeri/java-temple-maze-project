@@ -2,7 +2,10 @@ package student;
 
 import game.ExplorationState;
 import game.Node;
+import game.NodeStatus;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -77,11 +80,32 @@ public class ExploreStrategy {
         //    visitedNodeIds.add(currentState.getCurrentLocation());
 
         while(state.getDistanceToTarget() > 0) {
-            state.moveTo(pickNeighbourToMoveTo());
+            long targetNeighbour = pickNeighbourToMoveTo();
+            state.moveTo(targetNeighbour);
+            storeVisitedNode(targetNeighbour);
         }
     }
 
     private long pickNeighbourToMoveTo() {
+        long nodeToMoveTo = 0;
+        int minDistance = 100000;
+        Collection<NodeStatus> neighbours = state.getNeighbours();
+        for(NodeStatus neighbour: neighbours ){
+            int nodeDistance = neighbour.getDistanceToTarget();
+            if(!visitedNodeIds.contains(neighbour) && nodeDistance < minDistance){
+                minDistance = nodeDistance;
+                nodeToMoveTo = neighbour.getId();
+            }
+        }
+        return nodeToMoveTo;
+    }
 
+    private boolean previouslyVisited(){
+        boolean isVisited = false;
+        return isVisited;
+    }
+
+    private void storeVisitedNode(long nodeID){
+        visitedNodeIds.add(nodeID);
     }
 }
