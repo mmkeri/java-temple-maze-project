@@ -11,89 +11,114 @@ import java.util.stream.Collectors;
  */
 public class ExploreStrategy {
     final ExplorationState state;
-    Collection<NodeStatus> nodesToEvaluate = new ArrayList<>();
+    ArrayList<NodeStatus> nodesToEvaluate = new ArrayList<>();
+    private List<Long> possiblePath = null;
     final List<Long> nodesPreviouslyVisited = new LinkedList<>();
     final Collection<Long> deadEndPaths = new ArrayList<>();
+    private TreeMap<SortKey, List<Long> > potentialPaths = new TreeMap<>();
 
     public ExploreStrategy(ExplorationState state) {
         this.state = state;
     }
 
-    public long firstMoveFromStart(){
-        int shortestDist = 10000;
-        long nextNode = 0;
+    class SortKey implements Comparable<SortKey>  {
+        final int distance;
+        final long id;
+        public SortKey(NodeStatus status) {
+            this.distance = status.getDistanceToTarget();
+            this.id = status.getId();
+        }
 
-        nodesToEvaluate.addAll(state.getNeighbours());
-        for(NodeStatus node: nodesToEvaluate){
-            if(node.getDistanceToTarget() < shortestDist){
-                shortestDist = node.getDistanceToTarget();
-                nextNode = node.getId();
+        @Override
+        public int compareTo(SortKey other) {
+            int distanceDiff = this.distance - other.distance;
+            if (distanceDiff != 0) {
+                return distanceDiff;
+            }
+
+            // okay, distance is equal. We still need keys from different IDs to be considered
+            // different keys
+            if (this.id < other.id) {
+                return -1;
+            } else if(this.id == other.id) {
+                return 0;
+            } else {
+                return 1;
             }
         }
-        nodesPreviouslyVisited.add(state.getCurrentLocation());
-        return nextNode;
     }
 
-    public long pickNeighbourToMoveTo() {
-
-        nodesToEvaluate.addAll(state.getNeighbours());
-        long nextNode = 0;
-        int shortestDist = 100000;
+    private ArrayList<NodeStatus> removePreviouslyVisitedNodes(ArrayList<NodeStatus> nodeList){
 
         ArrayList<NodeStatus> adjustedNodes = nodesToEvaluate
                 .stream().filter(x -> !nodesPreviouslyVisited.contains(x.getId()))
                 .collect(Collectors.toCollection(ArrayList<NodeStatus>::new));
-        nodesToEvaluate = adjustedNodes;
+        return adjustedNodes;
+    }
+
+    private ArrayList<NodeStatus> removeDeadEndNodes(ArrayList<NodeStatus> nodeList){
 
         ArrayList<NodeStatus> readjustedNodes = nodesToEvaluate
                 .stream().filter(x -> !deadEndPaths.contains(x.getId()))
                 .collect(Collectors.toCollection(ArrayList<NodeStatus>::new));
-        nodesToEvaluate = readjustedNodes;
-
-        if(nodesToEvaluate.size() == 0){
-            deadEndPaths.add(state.getCurrentLocation());
-            nextNode = retraceSteps();
-            System.out.println("Backing up to node " + nextNode);
-            //nextNode = pickNeighbourToMoveTo();
-
-        }
-
-        for(NodeStatus node: nodesToEvaluate){
-            if(node.getDistanceToTarget() < shortestDist){
-                shortestDist = node.getDistanceToTarget();
-                nextNode = node.getId();
-            }
-        }
-        nodesToEvaluate.clear();
-        if(!deadEndPaths.contains(state.getCurrentLocation())) {
-            nodesPreviouslyVisited.add(state.getCurrentLocation());
-        }
-        System.out.println("Moving to node " + nextNode);
-        return nextNode;
+        return readjustedNodes;
     }
 
-    public long retraceSteps(){
-        long nextNode;
-        int shortestDist = 100000;
+    private void retraceSteps (){
 
-        nextNode = nodesPreviouslyVisited.remove(nodesPreviouslyVisited.size() - 1);
-        deadEndPaths.add(state.getCurrentLocation());
-        System.out.println("Should be backing up to " + nextNode);
+        SortKey pathKey = potentialPaths.firstKey();
+        List<Long> path = potentialPaths.get(pathKey);
+        potentialPaths.remove(pathKey);
+        long newRoute = path.remove(path.size() - 1);
+        long lastCommon = path.remove(path.size() - 1);
+        List<Long> newPath = new LinkedList<>(nodesPreviouslyVisited);
+        newPath.removeAll(path);
+        newPath.remove(newPath.size() - 1);
+        nodesPreviouslyVisited.removeAll(newPath);
+        Collections.reverse(newPath);
+        newPath.add(newRoute);
+        deadEndPaths.addAll(newPath);
+        for(Long node: newPath){
+            state.moveTo(node);
+        }
+        doExplore();
+    }
+
+    private long exploring(){
+        long shortestPath = 100000;
+        NodeStatus nextNode = null;
+
+        nodesPreviouslyVisited.add(state.getCurrentLocation());
+
+        nodesToEvaluate.addAll(state.getNeighbours());
+        nodesToEvaluate = removePreviouslyVisitedNodes(nodesToEvaluate);
+        nodesToEvaluate = removeDeadEndNodes(nodesToEvaluate);
+
+        for(NodeStatus n: nodesToEvaluate){
+            if(n.getDistanceToTarget() < shortestPath){
+                nextNode = n;
+                shortestPath = n.getDistanceToTarget();
+            }
+        }
+        nodesToEvaluate.remove(nextNode);
+
+        for(NodeStatus n: nodesToEvaluate){
+            possiblePath = new LinkedList<>(nodesPreviouslyVisited);
+            possiblePath.add(n.getId());
+            potentialPaths.put(new SortKey(n), possiblePath);
+        }
         nodesToEvaluate.clear();
-        return  nextNode;
+        if(nextNode == null){
+            retraceSteps();
+        }
+        return nextNode.getId();
     }
 
 
     public void doExplore() {
-
-        long firstMove = firstMoveFromStart();
-        System.out.println("First move taken");
-        state.moveTo(firstMove);
-
         while(state.getDistanceToTarget() > 0) {
-            long pickedNeighbour = pickNeighbourToMoveTo();
-            System.out.println("picked: "+pickedNeighbour);
-            state.moveTo(pickedNeighbour);
+            long nodeToMoveTo = exploring();
+            state.moveTo(nodeToMoveTo);
         }
     }
 }
