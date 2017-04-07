@@ -62,6 +62,6 @@ public class Explorer {
    * @param state the information available at the current state
    */
   public void escape(EscapeState state) {
-    //TODO: Escape from the cavern before time runs out
+    new EscapeStrategy(state).doEscape();
   }
 }

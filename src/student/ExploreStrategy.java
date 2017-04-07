@@ -64,7 +64,7 @@ public class ExploreStrategy {
         return readjustedNodes;
     }
 
-    private void retraceSteps (){
+    private List<Long> retraceSteps (){
 
         SortKey pathKey = potentialPaths.firstKey();
         List<Long> path = potentialPaths.get(pathKey);
@@ -78,10 +78,10 @@ public class ExploreStrategy {
         Collections.reverse(newPath);
         newPath.add(newRoute);
         deadEndPaths.addAll(newPath);
-        for(Long node: newPath){
+        /*for(Long node: newPath){
             state.moveTo(node);
-        }
-        doExplore();
+        }*/
+        return newPath;
     }
 
     private long exploring(){
@@ -109,7 +109,12 @@ public class ExploreStrategy {
         }
         nodesToEvaluate.clear();
         if(nextNode == null){
-            retraceSteps();
+            List<Long> newPath = retraceSteps();
+            long newNextNode = newPath.remove(newPath.size()-1);
+            for(Long node: newPath) {
+                state.moveTo(node);
+            }
+            return newNextNode;
         }
         return nextNode.getId();
     }
