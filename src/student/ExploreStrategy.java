@@ -16,6 +16,7 @@ public class ExploreStrategy {
     final List<Long> nodesPreviouslyVisited = new LinkedList<>();
     final Collection<Long> deadEndPaths = new ArrayList<>();
     private TreeMap<SortKey, List<Long> > potentialPaths = new TreeMap<>();
+    private int countOfMovingAway = 0;
 
     public ExploreStrategy(ExplorationState state) {
         this.state = state;
@@ -115,6 +116,9 @@ public class ExploreStrategy {
                 state.moveTo(node);
             }
             return newNextNode;
+        }
+        if(nextNode.getDistanceToTarget() > shortestPath){
+            countOfMovingAway++;
         }
         return nextNode.getId();
     }

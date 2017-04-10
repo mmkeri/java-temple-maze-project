@@ -13,45 +13,83 @@ public class EscapeStrategy {
 
     private EscapeState state;
     private Collection<Node> mazeVertices = new TreeSet<>();
-    private Set<Node>  neighboursToEvaluate = new TreeSet<>();
-    private Node currentNode;
-    private Node nodeToMoveTo;
-    private List<Node> nodesToVisit= new LinkedList<>();
+    private Node exitNode;
+    private List<Node> currentPath = new LinkedList<>();
+    private List<Node> repeatedPath = new LinkedList<>();
+    private Set<Node> visitedNodes = new TreeSet<>(new NodeComparator());
+    private List<Node> bestPath = null;
+    private List<List<Node>> collectionOfPaths = new LinkedList<>();
+    private int maxDistance = 0;
+    private int maxGold = 0;
+    private int initialTimeRemaining = 0;
 
     public EscapeStrategy(EscapeState state) {
         this.state = state;
     }
     public void doEscape() {
         mazeVertices = state.getVertices();
-        List<Node> potentialPath = possiblePath();
-        for(int i = 0; i < 3;i++) {
-            System.out.println(state.getTimeRemaining());
-            currentNode = state.getCurrentNode();
-            neighboursToEvaluate = currentNode.getNeighbours();
-            nodeToMoveTo = neighboursToEvaluate.iterator().next();
-            nodesToVisit.add(nodeToMoveTo);
-            state.moveTo(nodeToMoveTo);
-            System.out.println(state.getTimeRemaining());
+        exitNode = state.getExit();
+        Node startNode = state.getCurrentNode();
+        initialTimeRemaining = state.getTimeRemaining();
+        walkTheGraph(startNode, currentPath, visitedNodes);
+        System.out.println("just finished walking the graph");
+        bestPath.remove(startNode);
+        bestPath.add(exitNode);
+        for(Node n: bestPath){
+            state.moveTo(n);
+            if(n.getTile().getGold() > 0){
+                state.pickUpGold();
+            }
         }
-        for(Node n: nodesToVisit){
-            System.out.println(n);
-        }
-        for(Node n: potentialPath){
-            System.out.println(n);
-        }
+        state.getExit();
     }
-    private List<Node> possiblePath(){
-        Node currentNode = state.getCurrentNode();
-        Node nextNode = null;
-        Set<Node>  neighbours;
-        List<Node> possibleList = new LinkedList<>();
 
-        for(int i = 0; i < 5; i++){
-            neighbours = currentNode.getNeighbours();
-            possibleList.add(neighbours.iterator().next());
-            currentNode = neighbours.iterator().next();
-
+    class NodeComparator implements Comparator<Node> {
+        @Override
+        public int compare(Node o1, Node o2) {
+            if(o1.getId() == o2.getId()) {
+                return 0;
+            } else {
+                return -1;
+            }
         }
-        return possibleList;
+    };
+
+    private void walkTheGraph(Node n, List<Node> currentPath, Set<Node> visitedNodes){
+        visitedNodes.add(n);
+        if(currentPath.size() >= mazeVertices.size()){
+            return;
+        }
+        if (repeatedPath.contains(n)) {
+            currentPath.remove(n);
+            return;
+        }
+        if (currentPath.contains(n)) {
+            repeatedPath.add(n);
+        }
+        currentPath.add(n);
+        if(n == exitNode){
+            List<Node> copyOfPath = new LinkedList<>(currentPath);
+            scoreCurrentPath(copyOfPath);
+            copyOfPath.remove(n);
+            return;
+        }
+        for(Node child: n.getNeighbours()){
+            walkTheGraph(child, currentPath, visitedNodes);
+        }
+        currentPath.remove(n);
+    }
+
+    private void scoreCurrentPath(List<Node> path){
+        collectionOfPaths.add(path);
+        int distance = 0;
+        int gold = 0;
+        for(int i = 0; i < path.size() -1; i ++){
+            gold = gold + path.get(i).getTile().getGold();
+            distance = distance + path.get(i).getEdge(path.get(i + 1)).length();
+        }
+        if(distance >= maxDistance && distance <= initialTimeRemaining && gold >= maxGold) {
+            bestPath = path;
+        }
     }
 }
