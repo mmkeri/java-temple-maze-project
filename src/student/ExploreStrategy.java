@@ -71,7 +71,6 @@ public class ExploreStrategy {
         List<Long> path = potentialPaths.get(pathKey);
         potentialPaths.remove(pathKey);
         long newRoute = path.remove(path.size() - 1);
-        long lastCommon = path.remove(path.size() - 1);
         List<Long> newPath = new LinkedList<>(nodesPreviouslyVisited);
         newPath.removeAll(path);
         newPath.remove(newPath.size() - 1);
@@ -79,14 +78,12 @@ public class ExploreStrategy {
         Collections.reverse(newPath);
         newPath.add(newRoute);
         deadEndPaths.addAll(newPath);
-        /*for(Long node: newPath){
-            state.moveTo(node);
-        }*/
         return newPath;
     }
 
     private long exploring(){
         long shortestPath = 100000;
+        long previousDistanceLeft = 100000;
         NodeStatus nextNode = null;
 
         nodesPreviouslyVisited.add(state.getCurrentLocation());
@@ -94,6 +91,19 @@ public class ExploreStrategy {
         nodesToEvaluate.addAll(state.getNeighbours());
         nodesToEvaluate = removePreviouslyVisitedNodes(nodesToEvaluate);
         nodesToEvaluate = removeDeadEndNodes(nodesToEvaluate);
+        /**
+         * new code to try to reduce the distance away from goal travelled
+         */
+        /*
+        if(countOfMovingAway > 5){
+            List<Long> backtrackPAth = reversingPath(countOfMovingAway);
+            long newNextNode = backtrackPAth.remove(backtrackPAth.size() - 1);
+            for(Long Node : backtrackPAth){
+                state.moveTo(Node);
+            }
+            return newNextNode;
+        }
+        */
 
         for(NodeStatus n: nodesToEvaluate){
             if(n.getDistanceToTarget() < shortestPath){
@@ -117,10 +127,29 @@ public class ExploreStrategy {
             }
             return newNextNode;
         }
+        /*
         if(nextNode.getDistanceToTarget() > shortestPath){
             countOfMovingAway++;
         }
+        if(state.getDistanceToTarget() > previousDistanceLeft){
+            countOfMovingAway++;
+        }
+        previousDistanceLeft = state.getDistanceToTarget();
+        */
         return nextNode.getId();
+    }
+
+    private List<Long> reversingPath(int countOfMovingAway){
+        List<Long> reversePath = new LinkedList<>();
+        List<Long> pathNode;
+        for(int i = 0; i < countOfMovingAway; i++){
+            pathNode = retraceSteps();
+            reversePath.addAll(pathNode);
+        }
+
+        this.countOfMovingAway = 0;
+        return reversePath;
+
     }
 
 

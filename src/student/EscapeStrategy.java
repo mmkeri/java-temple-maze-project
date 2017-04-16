@@ -34,6 +34,8 @@ public class EscapeStrategy {
         int exitValue = testedWeightedNodes.get(exitNode);
         reversePath = backwardsPath.plotReversePath(exitNode, exitValue, testedWeightedNodes);
 
+        BroadExploration testPaths = new BroadExploration(startNode, exitNode, weightedNodes, mazeVertices, state.getTimeRemaining());
+
         reversePath.pop();
         while(!reversePath.empty()) {
             Node n = reversePath.pop();
