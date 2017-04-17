@@ -13,8 +13,6 @@ public class EscapeStrategy {
     private EscapeState state;
     private Collection<Node> mazeVertices = new TreeSet<>();
     private Node exitNode;
-    private HashMap<Node, Integer> weightedNodes = new HashMap<>();
-    private HashMap<Node, Integer> testedWeightedNodes;
     private Stack<Node> finalPath;
 
     public EscapeStrategy(EscapeState state) {
@@ -22,18 +20,12 @@ public class EscapeStrategy {
     }
     public void doEscape() {
 
-        DijkstraAlgo pathTester = new DijkstraAlgo(exitNode, weightedNodes);
         mazeVertices = state.getVertices();
         exitNode = state.getExit();
         Node startNode = state.getCurrentNode();
-        initializeUnvisitedNodeMap(weightedNodes, mazeVertices);
-        setStartNode(startNode);
-        testedWeightedNodes = pathTester.testPaths(startNode);
-        int exitValue = testedWeightedNodes.get(exitNode);
-        DijkstraPathConstructor constructedPath = new DijkstraPathConstructor(exitNode, exitValue, weightedNodes);
-        finalPath = constructedPath.constructPath();
+        DijkstraAlgo pathComputer = new DijkstraAlgo(mazeVertices, startNode, exitNode);
 
-        finalPath.pop();
+        finalPath = pathComputer.computeShortestPath();
 
         while(!finalPath.empty()) {
             Node n = finalPath.pop();
@@ -42,16 +34,6 @@ public class EscapeStrategy {
                 state.pickUpGold();
             }
         }
-    }
-
-    private void initializeUnvisitedNodeMap(HashMap<Node, Integer> weightedNodes, Collection<Node> vertices) {
-        for (Node n : vertices) {
-            weightedNodes.put(n, Integer.MAX_VALUE);
-        }
-    }
-
-    private void setStartNode(Node startNode){
-        weightedNodes.replace(startNode, Integer.MAX_VALUE, 0);
     }
 
 }
