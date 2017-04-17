@@ -71,6 +71,7 @@ public class ExploreStrategy {
         List<Long> path = potentialPaths.get(pathKey);
         potentialPaths.remove(pathKey);
         long newRoute = path.remove(path.size() - 1);
+        long lastCommon = path.remove(path.size() - 1);
         List<Long> newPath = new LinkedList<>(nodesPreviouslyVisited);
         newPath.removeAll(path);
         newPath.remove(newPath.size() - 1);

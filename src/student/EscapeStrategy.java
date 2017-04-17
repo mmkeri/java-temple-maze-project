@@ -23,6 +23,7 @@ public class EscapeStrategy {
         this.state = state;
     }
     public void doEscape() {
+
         DijkstraAlgo pathTester = new DijkstraAlgo();
         ReversePath backwardsPath = new ReversePath();
         mazeVertices = state.getVertices();
@@ -34,9 +35,8 @@ public class EscapeStrategy {
         int exitValue = testedWeightedNodes.get(exitNode);
         reversePath = backwardsPath.plotReversePath(exitNode, exitValue, testedWeightedNodes);
 
-        BroadExploration testPaths = new BroadExploration(startNode, exitNode, weightedNodes, mazeVertices, state.getTimeRemaining());
-
         reversePath.pop();
+
         while(!reversePath.empty()) {
             Node n = reversePath.pop();
             state.moveTo(n);
