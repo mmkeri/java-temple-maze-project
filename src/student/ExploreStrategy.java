@@ -11,15 +11,14 @@ import java.util.stream.Collectors;
  */
 public class ExploreStrategy {
     final ExplorationState state;
-    ArrayList<NodeStatus> nodesToEvaluate = new ArrayList<>();
-    private List<Long> possiblePath = null;
-    final List<Long> nodesPreviouslyVisited = new LinkedList<>();
+    final HashSet<Long> nodesPreviouslyVisited = new HashSet<>();
     final Collection<Long> deadEndPaths = new ArrayList<>();
     private TreeMap<SortKey, List<Long> > potentialPaths = new TreeMap<>();
-    private int countOfMovingAway = 0;
+    final private ExplorePathTracker pathTracker;
 
     public ExploreStrategy(ExplorationState state) {
         this.state = state;
+        pathTracker = new ExplorePathTracker(state);
     }
 
     class SortKey implements Comparable<SortKey>  {
@@ -51,7 +50,7 @@ public class ExploreStrategy {
 
     private ArrayList<NodeStatus> removePreviouslyVisitedNodes(ArrayList<NodeStatus> nodeList){
 
-        ArrayList<NodeStatus> adjustedNodes = nodesToEvaluate
+        ArrayList<NodeStatus> adjustedNodes = nodeList
                 .stream().filter(x -> !nodesPreviouslyVisited.contains(x.getId()))
                 .collect(Collectors.toCollection(ArrayList<NodeStatus>::new));
         return adjustedNodes;
@@ -59,7 +58,7 @@ public class ExploreStrategy {
 
     private ArrayList<NodeStatus> removeDeadEndNodes(ArrayList<NodeStatus> nodeList){
 
-        ArrayList<NodeStatus> readjustedNodes = nodesToEvaluate
+        ArrayList<NodeStatus> readjustedNodes = nodeList
                 .stream().filter(x -> !deadEndPaths.contains(x.getId()))
                 .collect(Collectors.toCollection(ArrayList<NodeStatus>::new));
         return readjustedNodes;
@@ -70,16 +69,25 @@ public class ExploreStrategy {
         SortKey pathKey = potentialPaths.firstKey();
         List<Long> path = potentialPaths.get(pathKey);
         potentialPaths.remove(pathKey);
-        long newRoute = path.remove(path.size() - 1);
-        long lastCommon = path.remove(path.size() - 1);
-        List<Long> newPath = new LinkedList<>(nodesPreviouslyVisited);
-        newPath.removeAll(path);
-        newPath.remove(newPath.size() - 1);
-        nodesPreviouslyVisited.removeAll(newPath);
-        Collections.reverse(newPath);
-        newPath.add(newRoute);
-        deadEndPaths.addAll(newPath);
-        return newPath;
+        List<Long> currentPath = pathTracker.getCurrentPathFromOrigin();
+        final int highestCommonIndex = findHighestCommonIndex(path, currentPath);
+        List<Long> retracePath = new ArrayList<>();
+        for(int i = currentPath.size() - 2; i > highestCommonIndex; i--){
+            retracePath.add(currentPath.get(i));
+        }
+        retracePath.add(currentPath.get(highestCommonIndex));
+        for(int i = highestCommonIndex + 1; i < path.size(); i++){
+            retracePath.add(path.get(i));
+        }
+        return retracePath;
+    }
+
+    private int findHighestCommonIndex(List<Long> path, List<Long> currentPath) {
+        int i = 0;
+        while(currentPath.get(i).equals(path.get(i))){
+            i++;
+        }
+        return i - 1;
     }
 
     private long exploring(){
@@ -89,22 +97,9 @@ public class ExploreStrategy {
 
         nodesPreviouslyVisited.add(state.getCurrentLocation());
 
-        nodesToEvaluate.addAll(state.getNeighbours());
+        ArrayList<NodeStatus> nodesToEvaluate = new ArrayList<>(state.getNeighbours());
         nodesToEvaluate = removePreviouslyVisitedNodes(nodesToEvaluate);
-        nodesToEvaluate = removeDeadEndNodes(nodesToEvaluate);
-        /**
-         * new code to try to reduce the distance away from goal travelled
-         */
-        /*
-        if(countOfMovingAway > 5){
-            List<Long> backtrackPAth = reversingPath(countOfMovingAway);
-            long newNextNode = backtrackPAth.remove(backtrackPAth.size() - 1);
-            for(Long Node : backtrackPAth){
-                state.moveTo(Node);
-            }
-            return newNextNode;
-        }
-        */
+        //nodesToEvaluate = removeDeadEndNodes(nodesToEvaluate);
 
         for(NodeStatus n: nodesToEvaluate){
             if(n.getDistanceToTarget() < shortestPath){
@@ -112,52 +107,48 @@ public class ExploreStrategy {
                 shortestPath = n.getDistanceToTarget();
             }
         }
+        if(potentialPaths.size() > 0) {
+            SortKey bestAlternative = potentialPaths.firstKey();
+            if (bestAlternative.distance < shortestPath) {
+
+                for(NodeStatus n: nodesToEvaluate){
+                    List<Long> possiblePath = pathTracker.getCurrentPathFromOrigin();
+                    possiblePath.add(n.getId());
+                    potentialPaths.put(new SortKey(n), possiblePath);
+                }
+
+                List<Long> newPath = retraceSteps();
+                long newNextNode = newPath.remove(newPath.size() - 1);
+                for (Long node : newPath) {
+                    pathTracker.moveTo(node);
+                }
+                return newNextNode;
+            }
+        }
+
         nodesToEvaluate.remove(nextNode);
 
         for(NodeStatus n: nodesToEvaluate){
-            possiblePath = new LinkedList<>(nodesPreviouslyVisited);
+            List<Long> possiblePath = pathTracker.getCurrentPathFromOrigin();
             possiblePath.add(n.getId());
             potentialPaths.put(new SortKey(n), possiblePath);
         }
-        nodesToEvaluate.clear();
         if(nextNode == null){
             List<Long> newPath = retraceSteps();
             long newNextNode = newPath.remove(newPath.size()-1);
             for(Long node: newPath) {
-                state.moveTo(node);
+                pathTracker.moveTo(node);
             }
             return newNextNode;
         }
-        /*
-        if(nextNode.getDistanceToTarget() > shortestPath){
-            countOfMovingAway++;
-        }
-        if(state.getDistanceToTarget() > previousDistanceLeft){
-            countOfMovingAway++;
-        }
-        previousDistanceLeft = state.getDistanceToTarget();
-        */
         return nextNode.getId();
-    }
-
-    private List<Long> reversingPath(int countOfMovingAway){
-        List<Long> reversePath = new LinkedList<>();
-        List<Long> pathNode;
-        for(int i = 0; i < countOfMovingAway; i++){
-            pathNode = retraceSteps();
-            reversePath.addAll(pathNode);
-        }
-
-        this.countOfMovingAway = 0;
-        return reversePath;
-
     }
 
 
     public void doExplore() {
         while(state.getDistanceToTarget() > 0) {
             long nodeToMoveTo = exploring();
-            state.moveTo(nodeToMoveTo);
+            pathTracker.moveTo(nodeToMoveTo);
         }
     }
 }
