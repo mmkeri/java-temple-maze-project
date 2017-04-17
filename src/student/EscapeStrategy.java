@@ -1,9 +1,7 @@
 package student;
 
-import game.Edge;
 import game.EscapeState;
 import game.Node;
-import game.NodeStatus;
 
 import java.util.*;
 
@@ -17,28 +15,28 @@ public class EscapeStrategy {
     private Node exitNode;
     private HashMap<Node, Integer> weightedNodes = new HashMap<>();
     private HashMap<Node, Integer> testedWeightedNodes;
-    private Stack<Node> reversePath;
+    private Stack<Node> finalPath;
 
     public EscapeStrategy(EscapeState state) {
         this.state = state;
     }
     public void doEscape() {
 
-        DijkstraAlgo pathTester = new DijkstraAlgo();
-        ReversePath backwardsPath = new ReversePath();
+        DijkstraAlgo pathTester = new DijkstraAlgo(exitNode, weightedNodes);
         mazeVertices = state.getVertices();
         exitNode = state.getExit();
         Node startNode = state.getCurrentNode();
         initializeUnvisitedNodeMap(weightedNodes, mazeVertices);
         setStartNode(startNode);
-        testedWeightedNodes = pathTester.testPaths(startNode, exitNode, weightedNodes);
+        testedWeightedNodes = pathTester.testPaths(startNode);
         int exitValue = testedWeightedNodes.get(exitNode);
-        reversePath = backwardsPath.plotReversePath(exitNode, exitValue, testedWeightedNodes);
+        DijkstraPathConstructor constructedPath = new DijkstraPathConstructor(exitNode, exitValue, weightedNodes);
+        finalPath = constructedPath.constructPath();
 
-        reversePath.pop();
+        finalPath.pop();
 
-        while(!reversePath.empty()) {
-            Node n = reversePath.pop();
+        while(!finalPath.empty()) {
+            Node n = finalPath.pop();
             state.moveTo(n);
             if (n.getTile().getGold() > 0) {
                 state.pickUpGold();

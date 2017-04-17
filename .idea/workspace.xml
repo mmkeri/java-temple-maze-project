@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="1969128b-348b-49f7-969c-8d9fbeb3b43a" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/student/BroadExploration.java" afterPath="" />
+    <list default="true" id="1969128b-348b-49f7-969c-8d9fbeb3b43a" name="Default" comment="Cleaning up method and class names">
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/student/ReversePath.java" afterPath="$PROJECT_DIR$/src/student/DijkstraPathConstructor.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/student/DijkstraAlgo.java" afterPath="$PROJECT_DIR$/src/student/DijkstraAlgo.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/student/EscapeStrategy.java" afterPath="$PROJECT_DIR$/src/student/EscapeStrategy.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/student/ExploreStrategy.java" afterPath="$PROJECT_DIR$/src/student/ExploreStrategy.java" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -33,7 +33,7 @@
         <entry file="file://$PROJECT_DIR$/src/student/ExploreStrategy.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="137">
-              <caret line="130" column="10" lean-forward="true" selection-start-line="130" selection-start-column="10" selection-end-line="130" selection-end-column="10" />
+              <caret line="130" column="10" lean-forward="false" selection-start-line="130" selection-start-column="10" selection-end-line="130" selection-end-column="10" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -74,8 +74,8 @@
       <file leaf-file-name="EscapeStrategy.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/student/EscapeStrategy.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-151">
-              <caret line="25" column="0" lean-forward="true" selection-start-line="25" selection-start-column="0" selection-end-line="25" selection-end-column="0" />
+            <state relative-caret-position="254">
+              <caret line="24" column="74" lean-forward="false" selection-start-line="24" selection-start-column="74" selection-end-line="24" selection-end-column="74" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -83,11 +83,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ReversePath.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/student/ReversePath.java">
+      <file leaf-file-name="DijkstraPathConstructor.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/student/DijkstraPathConstructor.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="345">
-              <caret line="37" column="0" lean-forward="false" selection-start-line="37" selection-start-column="0" selection-end-line="37" selection-end-column="0" />
+            <state relative-caret-position="299">
+              <caret line="43" column="19" lean-forward="false" selection-start-line="43" selection-start-column="19" selection-end-line="43" selection-end-column="19" />
               <folding />
             </state>
           </provider>
@@ -96,8 +96,8 @@
       <file leaf-file-name="DijkstraAlgo.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/student/DijkstraAlgo.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="318">
-              <caret line="66" column="0" lean-forward="true" selection-start-line="12" selection-start-column="4" selection-end-line="66" selection-end-column="0" />
+            <state relative-caret-position="60">
+              <caret line="21" column="62" lean-forward="false" selection-start-line="21" selection-start-column="62" selection-end-line="21" selection-end-column="62" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -166,15 +166,16 @@
         <option value="$PROJECT_DIR$/src/student/EscapePath.java" />
         <option value="$PROJECT_DIR$/src/student/EscapePathNode.java" />
         <option value="$PROJECT_DIR$/src/student/TreeNode.java" />
-        <option value="$PROJECT_DIR$/src/student/DijkstraAlgo.java" />
         <option value="$PROJECT_DIR$/src/student/dijkstraAlgo.java" />
-        <option value="$PROJECT_DIR$/src/student/ReversePath.java" />
         <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/src/student/ExploreStrategy.java" />
         <option value="$PROJECT_DIR$/src/game/ExploringDijkstra.java" />
         <option value="$PROJECT_DIR$/src/student/SecondDijkstra.java" />
         <option value="$PROJECT_DIR$/src/student/BroadExploration.java" />
         <option value="$PROJECT_DIR$/src/student/LongDijkstra.java" />
+        <option value="$PROJECT_DIR$/src/student/ReversePath.java" />
+        <option value="$PROJECT_DIR$/src/student/DijkstraPathConstructor.java" />
+        <option value="$PROJECT_DIR$/src/student/DijkstraAlgo.java" />
         <option value="$PROJECT_DIR$/src/student/EscapeStrategy.java" />
       </list>
     </option>
@@ -898,7 +899,8 @@
     <MESSAGE value="Escape strategy gets you out but not perfected to give maximum gold" />
     <MESSAGE value="Clean up of classes and Escape method" />
     <MESSAGE value="Added gitignore file" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added gitignore file" />
+    <MESSAGE value="Cleaning up method and class names" />
+    <option name="LAST_COMMIT_MESSAGE" value="Cleaning up method and class names" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1270,28 +1272,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/student/DijkstraAlgo.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="318">
-          <caret line="66" column="0" lean-forward="true" selection-start-line="12" selection-start-column="4" selection-end-line="66" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/game/GameState.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="96">
           <caret line="156" column="0" lean-forward="false" selection-start-line="156" selection-start-column="0" selection-end-line="156" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/student/ReversePath.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="345">
-          <caret line="37" column="0" lean-forward="false" selection-start-line="37" selection-start-column="0" selection-end-line="37" selection-end-column="0" />
           <folding />
         </state>
       </provider>
@@ -1307,7 +1291,7 @@
     <entry file="file://$PROJECT_DIR$/src/student/ExploreStrategy.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="137">
-          <caret line="130" column="10" lean-forward="true" selection-start-line="130" selection-start-column="10" selection-end-line="130" selection-end-column="10" />
+          <caret line="130" column="10" lean-forward="false" selection-start-line="130" selection-start-column="10" selection-end-line="130" selection-end-column="10" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -1322,10 +1306,28 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/student/DijkstraPathConstructor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="299">
+          <caret line="43" column="19" lean-forward="false" selection-start-line="43" selection-start-column="19" selection-end-line="43" selection-end-column="19" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/student/DijkstraAlgo.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="21" column="62" lean-forward="false" selection-start-line="21" selection-start-column="62" selection-end-line="21" selection-end-column="62" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/student/EscapeStrategy.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-151">
-          <caret line="25" column="0" lean-forward="true" selection-start-line="25" selection-start-column="0" selection-end-line="25" selection-end-column="0" />
+        <state relative-caret-position="254">
+          <caret line="24" column="74" lean-forward="false" selection-start-line="24" selection-start-column="74" selection-end-line="24" selection-end-column="74" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

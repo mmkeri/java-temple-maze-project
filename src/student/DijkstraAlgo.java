@@ -11,20 +11,15 @@ import java.util.*;
 public class DijkstraAlgo {
 
     private Node exitNode;
-    private HashMap<Node, Integer> weightedNodes = new HashMap<>();
+    private HashMap<Node, Integer> weightedNodes;
     private Set<Node> visitedNodes = new HashSet<>();
 
-    public void setExitNode(Node exitNode){
-        this.exitNode = exitNode;
+    public DijkstraAlgo(Node targetNode, HashMap<Node, Integer> initialWeightedNodes){
+        this.exitNode = targetNode;
+        this.weightedNodes = initialWeightedNodes;
     }
 
-    public void setWeightedNodes(HashMap<Node, Integer> weightedNodes){
-        this.weightedNodes = weightedNodes;
-    }
-
-    public HashMap<Node, Integer> testPaths(Node currentNode, Node targetNode, HashMap<Node, Integer> initialWeightedNodes){
-        setExitNode(targetNode);
-        setWeightedNodes(initialWeightedNodes);
+    public HashMap<Node, Integer> testPaths(Node currentNode){
         dijktrasPath(currentNode);
         return weightedNodes;
     }
