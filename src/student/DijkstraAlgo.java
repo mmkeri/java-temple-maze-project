@@ -16,29 +16,47 @@ public class DijkstraAlgo {
      */
 
     private Collection<Node> mazeVertices;
-    private Node exitNode;
+    private Node destinationNode;
     private Node startNode;
-    private HashMap<Node, Integer> weightedNodes = new HashMap<>();
+    private Stack<Node> path;
+    private int pathCost = 0;
+
+    public Node getDestinationNode(){
+        return destinationNode;
+    }
+
+    public Node getStartNode(){
+        return startNode;
+    }
+    public int getPathCost(){
+        return pathCost;
+    }
+
+    public Stack<Node> getPath(){
+        return path;
+    }
 
     public DijkstraAlgo(Collection<Node> mazeVertices, Node startNode, Node exitNode) {
         this.mazeVertices = mazeVertices;
         this.startNode = startNode;
-        this.exitNode = exitNode;
+        this.destinationNode = exitNode;
+    }
+
+    public Stack<Node> computeShortestPath() {
+        HashMap<Node, Integer> weightedNodes = new HashMap<>();
         for (Node n : mazeVertices) {
             weightedNodes.put(n, Integer.MAX_VALUE);
         }
         weightedNodes.replace(startNode, Integer.MAX_VALUE, 0);
-    }
 
-    public Stack<Node> computeShortestPath() {
-        DijkstraCostUpdater costUpdater = new DijkstraCostUpdater(exitNode, weightedNodes);
+        DijkstraCostUpdater costUpdater = new DijkstraCostUpdater(destinationNode, weightedNodes);
         costUpdater.computeCosts(startNode);
-        int exitValue = weightedNodes.get(exitNode);
-        DijkstraPathConstructor constructedPath = new DijkstraPathConstructor(exitNode, exitValue, weightedNodes);
+        pathCost = weightedNodes.get(destinationNode);
+        DijkstraPathConstructor constructedPath = new DijkstraPathConstructor(destinationNode, pathCost, weightedNodes);
 
-        Stack<Node> finalPath = constructedPath.constructPath();
-        finalPath.pop();
-        return finalPath;
+        path = constructedPath.constructPath();
+        path.pop();
+        return path;
     }
 }
 

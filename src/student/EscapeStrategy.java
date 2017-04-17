@@ -17,23 +17,63 @@ public class EscapeStrategy {
 
     public EscapeStrategy(EscapeState state) {
         this.state = state;
-    }
-    public void doEscape() {
-
         mazeVertices = state.getVertices();
         exitNode = state.getExit();
+    }
+
+    public void doEscape() {
+
         Node startNode = state.getCurrentNode();
-        DijkstraAlgo pathComputer = new DijkstraAlgo(mazeVertices, startNode, exitNode);
 
-        finalPath = pathComputer.computeShortestPath();
-
-        while(!finalPath.empty()) {
-            Node n = finalPath.pop();
-            state.moveTo(n);
-            if (n.getTile().getGold() > 0) {
+        while(state.getCurrentNode() != exitNode){
+            if(state.getCurrentNode().getTile().getGold() > 0){
                 state.pickUpGold();
+            }
+            List<DijkstraAlgo> goldPaths = findNeighboursWithGold(1);
+            if(goldPaths.size() == 0){
+                finalPath = runDijkstra(state.getCurrentNode(), exitNode).getPath();
+                while (!finalPath.empty()) {
+                    state.moveTo(finalPath.pop());
+                }
+            } else {
+                state.moveTo(goldPaths.get(0).getPath().pop());
             }
         }
     }
 
+    public DijkstraAlgo runDijkstra(Node startNode, Node destinationNode) {
+        DijkstraAlgo dijkstra = new DijkstraAlgo(mazeVertices, startNode, destinationNode);
+        dijkstra.computeShortestPath();
+        return dijkstra;
+    }
+
+    public List<DijkstraAlgo> findNeighboursWithGold(int requestedCount) {
+
+        List<DijkstraAlgo> neighboursWithGold = new ArrayList<>(requestedCount);
+        Set<Node> seenNodes = new HashSet<>();
+        Queue<Node> unprocessedNodes = new ArrayDeque<>();
+
+        unprocessedNodes.add(state.getCurrentNode());
+        while(!unprocessedNodes.isEmpty() && neighboursWithGold.size() < requestedCount){
+            Node current = unprocessedNodes.poll();
+
+            seenNodes.add(current);
+            if(current.getTile().getGold() > 0){
+                DijkstraAlgo dijkstraToNode = runDijkstra(state.getCurrentNode(), current);
+                DijkstraAlgo dijkstraOutFromNode = runDijkstra(current, exitNode);
+                int totalPathCost = dijkstraToNode.getPathCost() + dijkstraOutFromNode.getPathCost();
+                if(totalPathCost < state.getTimeRemaining()) {
+                    neighboursWithGold.add(dijkstraToNode);
+                }
+            }
+            for(Node n : current.getNeighbours()){
+                if(seenNodes.contains(n)){
+                    continue;
+                } else {
+                    unprocessedNodes.add(n);
+                }
+            }
+        }
+        return neighboursWithGold;
+    }
 }
