@@ -5,6 +5,7 @@ import game.Node;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Stack;
 
 /**
@@ -13,12 +14,12 @@ import java.util.Stack;
 public class DijkstraPathConstructor {
 
     private Stack<Node> exitPath = new Stack();
-    private HashMap<Node, Integer> weightedNodes;
+    private Map<Node, Integer> weightedNodes;
     private Node exitNode;
     private int exitValue;
 
 
-    public DijkstraPathConstructor(Node exitNode, int exitValue, HashMap<Node, Integer> weightedNodes){
+    public DijkstraPathConstructor(Node exitNode, int exitValue, Map<Node, Integer> weightedNodes){
         this.exitNode = exitNode;
         this.exitValue = exitValue;
         this.weightedNodes = weightedNodes;

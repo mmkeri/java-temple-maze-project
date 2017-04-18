@@ -10,8 +10,8 @@ import java.util.List;
  */
 public class ExplorePathTracker {
 
-    final private ExplorationState state;
-    final private List<Long> currentPathFromOrigin = new ArrayList<>();
+    final ExplorationState state;
+    final List<Long> currentPathFromOrigin = new ArrayList<>();
 
     public ExplorePathTracker(ExplorationState state){
         this.state = state;

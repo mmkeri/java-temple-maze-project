@@ -11,15 +11,15 @@ import java.util.*;
 public class DijkstraCostUpdater {
 
     private Node exitNode;
-    private HashMap<Node, Integer> weightedNodes;
+    private Map<Node, Integer> weightedNodes;
     private Set<Node> visitedNodes = new HashSet<>();
 
-    public DijkstraCostUpdater(Node targetNode, HashMap<Node, Integer> initialWeightedNodes){
+    public DijkstraCostUpdater(Node targetNode, Map<Node, Integer> initialWeightedNodes){
         this.exitNode = targetNode;
         this.weightedNodes = initialWeightedNodes;
     }
 
-    public HashMap<Node, Integer> computeCosts(Node currentNode){
+    public Map<Node, Integer> computeCosts(Node currentNode){
         dijktrasPath(currentNode);
         return weightedNodes;
     }

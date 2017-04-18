@@ -23,8 +23,6 @@ public class EscapeStrategy {
 
     public void doEscape() {
 
-        Node startNode = state.getCurrentNode();
-
         while(state.getCurrentNode() != exitNode){
             if(state.getCurrentNode().getTile().getGold() > 0){
                 state.pickUpGold();
