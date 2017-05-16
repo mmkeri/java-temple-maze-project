@@ -13,23 +13,49 @@ import java.util.Stack;
  */
 public class DijkstraPathConstructor {
 
+    /**
+     * Stack of Nodes that represents the path out of the maze
+     */
     private Stack<Node> exitPath = new Stack();
+    /**
+     * Map containing the Nodes with weights that have been determined by using
+     * Dijsktra's algorithm
+     */
     private Map<Node, Integer> weightedNodes;
+    /**
+     * The exit node of the current
+     */
     private Node exitNode;
     private int exitValue;
 
-
+    /**
+     * Constructor for the DijsktraPathConstructor
+     * @param exitNode
+     * @param exitValue
+     * @param weightedNodes
+     */
     public DijkstraPathConstructor(Node exitNode, int exitValue, Map<Node, Integer> weightedNodes){
         this.exitNode = exitNode;
         this.exitValue = exitValue;
         this.weightedNodes = weightedNodes;
     }
 
+    /**
+     * Returns a stack of Nodes that represents the path the character
+     * needs to take to get to the exit
+     * @return Stack<Node>
+     */
     public Stack<Node> constructPath(){
         reverseWalkPath(exitNode, exitValue);
         return exitPath;
     }
 
+    /**
+     * Constructs a path backwards from either a dead-end or from a point that
+     * is deemed "too far away" from the exit
+     * @param currentNode
+     * @param currentWeight
+     */
     private void reverseWalkPath(Node currentNode, int currentWeight){
         Collection<Edge> currentEdges = currentNode.getExits();
         Node nextNode = null;
